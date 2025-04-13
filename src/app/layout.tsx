@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Itim } from "next/font/google";
 import "./globals.css";
+import Navbar from "@/components/layouts/Navbar";
 
 const itim = Itim({
   variable: "--font-itim",
@@ -32,8 +33,12 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${itim.variable} antialiased`}
+        suppressHydrationWarning={true}
       >
-        {children}
+        <main>
+          <Navbar />
+          {children}
+        </main>
       </body>
     </html>
   );
