@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Itim } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layouts/Navbar";
+import PageContainer from "@/components/layouts/PageContainer";
 
 const itim = Itim({
   variable: "--font-itim",
@@ -37,7 +38,7 @@ export default function RootLayout({
       >
         <main>
           <Navbar />
-          {children}
+          <PageContainer children={children} />
         </main>
       </body>
     </html>
