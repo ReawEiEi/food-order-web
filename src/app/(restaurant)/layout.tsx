@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Itim } from "next/font/google";
-import "./globals.css";
-import Navbar from "@/components/layouts/Navbar";
+import "../globals.css";
 import PageContainer from "@/components/layouts/PageContainer";
+import NavbarRestaurant from "@/components/layouts/NavbarRestaurant";
+import FooterRestaurant from "@/components/layouts/FooterRestaurant";
 
 const itim = Itim({
   variable: "--font-itim",
@@ -37,8 +38,9 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         <main>
-          <Navbar />
+          <NavbarRestaurant />
           <PageContainer children={children} />
+          <FooterRestaurant/>
         </main>
       </body>
     </html>
