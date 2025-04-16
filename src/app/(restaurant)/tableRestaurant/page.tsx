@@ -8,6 +8,11 @@ import DropDownTableStatus from "@/components/table/DropDownTableStatus";
 import { createTable } from "@/services/table/createTable";
 import toast from "react-hot-toast";
 import CreateTableModal from "@/components/table/CreateTableModal";
+import { TableStatus } from "@/enum/tableStatus";
+import DeleteTableModal from "@/components/table/DeleteTableModal";
+import EditTableModal from "@/components/table/EditTableModal";
+import { deleteTable } from "@/services/table/deleteTable";
+import { editTableStatus } from "@/services/table/editTableStatus";
 
 export default function TableRestaurant() {
   const [showTableModal, setShowTableModal] = useState(false);
@@ -15,7 +20,40 @@ export default function TableRestaurant() {
   const restaurantId = useCustomerStore((s) => s.restaurantId);
   const [searchStatus, setSearchStatus] = useState<string>("");
 
-  //TODO: Modify Edit and Delete Table
+  const [editTable, setEditTable] = useState<{
+    id: string;
+    status: TableStatus;
+  } | null>(null);
+  const [deleteTableId, setDeleteTableId] = useState<string | null>(null);
+
+  const handleEditTable = async (newStatus: TableStatus) => {
+    if (!editTable) return;
+    try {
+      await editTableStatus(editTable.id, newStatus);
+      toast.success("Table updated!");
+    } catch {
+      toast.error("Failed to update table.");
+    }
+    setTables((prev) => ({
+      result: prev.result.map((table) =>
+        table.ID === editTable.id ? { ...table, Status: newStatus } : table
+      ),
+    }));
+  };
+
+  const handleDeleteTable = async () => {
+    if (!deleteTableId) return;
+    try {
+      await deleteTable(deleteTableId);
+      toast.success("Table deleted!");
+    } catch {
+      toast.error("Failed to delete table.");
+    }
+    setTables((prev) => ({
+      result: prev.result.filter((table) => table.ID !== deleteTableId),
+    }));
+  };
+
   useEffect(() => {
     const fetchTable = async () => {
       try {
@@ -66,8 +104,10 @@ export default function TableRestaurant() {
             onChange={setSearchStatus}
           />
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 px-6 w-full mb-15">
+        <div className="text-md font-semibold underline underline-offset-4 mt-5">
+          Number of Table: {tables.result.length}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-1 px-6 w-full mb-15">
           {tables.result
             .filter((t) =>
               searchStatus === "" ? true : t.Status === searchStatus
@@ -77,8 +117,11 @@ export default function TableRestaurant() {
               <TableCard
                 key={table.ID}
                 table={table}
-                onEdit={(id) => console.log("Edit", id)}
-                onDelete={(id) => console.log("Delete", id)}
+                onEdit={(id) => {
+                  const table = tables.result.find((t) => t.ID === id);
+                  if (table) setEditTable({ id, status: table.Status });
+                }}
+                onDelete={(id) => setDeleteTableId(id)}
               />
             ))}
         </div>
@@ -88,6 +131,20 @@ export default function TableRestaurant() {
         <CreateTableModal
           onClose={() => setShowTableModal(false)}
           onCreate={handleCreateTable}
+        />
+      )}
+      {editTable && (
+        <EditTableModal
+          currentStatus={editTable.status}
+          onClose={() => setEditTable(null)}
+          onSave={handleEditTable}
+        />
+      )}
+
+      {deleteTableId && (
+        <DeleteTableModal
+          onClose={() => setDeleteTableId(null)}
+          onDelete={handleDeleteTable}
         />
       )}
     </>

@@ -7,7 +7,6 @@ export default function FooterRestaurant() {
   const router = useRouter();
   const pathname = usePathname();
 
-  //TODO: Correct Path
   const navItems = [
     { label: "Home", icon: <Home size={20} />, path: "/" },
     { label: "Menu", icon: <Utensils size={20} />, path: "/menusRestaurant" },
