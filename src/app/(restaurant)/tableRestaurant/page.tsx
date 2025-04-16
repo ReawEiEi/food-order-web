@@ -1,6 +1,6 @@
 "use client";
 
-import TableCard from "@/components/shared/tableCard";
+import TableCard from "@/components/table/tableCard";
 import { findAllTableByRestaurantID } from "@/services/table/findAllTableByRestaurantID";
 import { useCustomerStore } from "@/stores/customerStore";
 import { useEffect, useState } from "react";
@@ -87,7 +87,7 @@ export default function TableRestaurant() {
 
   return (
     <>
-      <div className="flex flex-col items-center gap-y-4">
+      <div className="flex flex-col items-center gap-y-4 mt-6">
         <h1 className="text-2xl font-bold">Table of Restaurant</h1>
         <button
           onClick={() => setShowTableModal(true)}

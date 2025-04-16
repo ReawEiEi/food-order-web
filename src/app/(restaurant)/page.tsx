@@ -71,7 +71,7 @@ export default function HomePage() {
   };
 
   return (
-    <div>
+    <div className="mt-6">
       <h1 className="text-2xl font-bold text-center">Welcome to Food Order</h1>
       <p className="text-center mt-2">
         Your one-stop solution for food order services!
