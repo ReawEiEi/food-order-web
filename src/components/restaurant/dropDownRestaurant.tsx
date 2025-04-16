@@ -6,7 +6,7 @@ interface DropDownProps {
   onChange: (value: string) => void;
 }
 
-export default function DropDown({
+export default function DropDownRestaurant({
   title,
   className,
   options,

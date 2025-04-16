@@ -1,9 +1,12 @@
 "use client";
 
-import DropDown from "@/components/shared/dropDown";
+import CreateRestaurantModal from "@/components/restaurant/createRestaurantModal";
+import DropDownRestaurant from "@/components/restaurant/dropDownRestaurant";
+import createRestaurant from "@/services/restaurant/createRestaurant";
 import { findAllRestaurant } from "@/services/restaurant/findAllRestaurant";
 import { useCustomerStore } from "@/stores/customerStore";
 import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 
 export default function HomePage() {
   const setIds = useCustomerStore((s) => s.setIds);
@@ -12,6 +15,8 @@ export default function HomePage() {
   const [hydrated, setHydrated] = useState(false);
   const [restaurants, setRestaurants] = useState<any[]>([]);
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>("");
+
+  const [showRestaurantModal, setShowRestaurantModal] = useState(false);
 
   useEffect(() => {
     setHydrated(true);
@@ -41,6 +46,30 @@ export default function HomePage() {
     setIds(id, "", "");
   };
 
+  const handleCreateRestaurant = async (
+    restaurantName: string,
+    branchName: string
+  ) => {
+    try {
+      const res = await createRestaurant(restaurantName, branchName);
+      const newRestaurant = res.result;
+
+      if (newRestaurant?.ID && newRestaurant?.RestaurantName) {
+        setRestaurants((prev) => [...prev, newRestaurant]);
+        handleRestaurantChange(newRestaurant.ID);
+      } else {
+        const refreshed = await findAllRestaurant();
+        setRestaurants(refreshed);
+        toast("Fallback to refresh list.");
+      }
+
+      toast.success("Restaurant created successfully!");
+      setShowRestaurantModal(false);
+    } catch (err) {
+      toast.error("Failed to create restaurant. Please try again.");
+    }
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-center">Welcome to Food Order</h1>
@@ -53,7 +82,7 @@ export default function HomePage() {
           Select Your Restaurant
         </h2>
         {hydrated && (
-          <DropDown
+          <DropDownRestaurant
             title="Select a restaurant"
             className="w-4/5"
             options={restaurants}
@@ -61,6 +90,14 @@ export default function HomePage() {
             onChange={handleRestaurantChange}
           />
         )}
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded-md"
+          onClick={() => setShowRestaurantModal(true)}
+        >
+          Create Restaurant / Branch
+        </button>
+      </div>
+      <div className="flex flex-col items-center mt-12 gap-y-5">
         <button
           className="bg-yellow-500 text-white px-4 py-2 rounded-md"
           onClick={() =>
@@ -71,6 +108,12 @@ export default function HomePage() {
           Create Customer
         </button>
       </div>
+      {showRestaurantModal && (
+        <CreateRestaurantModal
+          onClose={() => setShowRestaurantModal(false)}
+          onCreate={handleCreateRestaurant}
+        />
+      )}
     </div>
   );
 }

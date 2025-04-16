@@ -10,9 +10,13 @@ export default function FooterRestaurant() {
   //TODO: Correct Path
   const navItems = [
     { label: "Home", icon: <Home size={20} />, path: "/" },
-    { label: "Menu", icon: <Utensils size={20} />, path: "/menu" },
-    { label: "Order", icon: <ShoppingCart size={20} />, path: "/order" },
-    { label: "Table", icon: <Armchair size={20} />, path: "/profile" },
+    { label: "Menu", icon: <Utensils size={20} />, path: "/menusRestaurant" },
+    {
+      label: "Menu Item",
+      icon: <ShoppingCart size={20} />,
+      path: "/menuItemsRestaurant",
+    },
+    { label: "Table", icon: <Armchair size={20} />, path: "/tableRestaurant" },
   ];
 
   const handleNavigate = (path: string) => {

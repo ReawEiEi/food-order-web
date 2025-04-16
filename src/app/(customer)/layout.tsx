@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Itim } from "next/font/google";
 import "../globals.css";
 import Navbar from "@/components/layouts/Navbar";
 import PageContainer from "@/components/layouts/PageContainer";
+import { Toaster } from "react-hot-toast";
 
 const itim = Itim({
   variable: "--font-itim",
@@ -37,6 +38,7 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         <main>
+          <Toaster position="top-right" />
           <Navbar />
           <PageContainer children={children} />
         </main>
