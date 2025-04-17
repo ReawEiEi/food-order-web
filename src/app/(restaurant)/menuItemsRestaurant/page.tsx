@@ -68,13 +68,14 @@ export default function MenuItemsRestaurant() {
   }, [restaurantId]);
 
   return (
-    <div className="px-6 py-8">
+    <div className="px-6 py-8 mb-10">
       <h1 className="text-2xl font-bold text-center mb-6">
         Menu Items of Restaurant
       </h1>
 
       {menusWithItems.map(({ menu, items }) => (
         <div key={menu.ID}>
+          <hr className="my-4 border-gray-300" />
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-xl font-semibold">🍽 {menu.MenuName}</h2>
             <button
@@ -87,20 +88,24 @@ export default function MenuItemsRestaurant() {
               + Add Item
             </button>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
-            {items.map((item) => (
-              <MenuItemCard
-                key={item.ID}
-                id={item.ID}
-                name={item.MenuItemName}
-                price={item.MenuItemPrice}
-                description={item.MenuItemDescription}
-                imageKey={item.MenuItemImageKey}
-                onEdit={() => setEditItem(item)}
-                onDelete={() => setDeleteId(item.ID)}
-              />
-            ))}
-          </div>
+          {items !== null ? (
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
+              {items.map((item) => (
+                <MenuItemCard
+                  key={item.ID}
+                  id={item.ID}
+                  name={item.MenuItemName}
+                  price={item.MenuItemPrice}
+                  description={item.MenuItemDescription}
+                  imageKey={item.MenuItemImageKey}
+                  onEdit={() => setEditItem(item)}
+                  onDelete={() => setDeleteId(item.ID)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="mb-6"></div>
+          )}
         </div>
       ))}
 

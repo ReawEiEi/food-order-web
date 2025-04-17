@@ -1,6 +1,14 @@
 import api from "@/api/axios";
 
-//TODO: Implement the createMenu function
-export async function createMenu() {
-  return;
+export async function createMenu(restaurantId: string, menuName: string) {
+  try {
+    const response = await api.post(`/CreateMenu`, {
+      restaurant_id: restaurantId,
+      menu_name: menuName,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error creating menu:", error);
+    throw error;
+  }
 }
