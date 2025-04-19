@@ -1,26 +1,36 @@
+"use client";
+
+import { useState } from "react";
+import OrderModal from "@/components/customer-menu/OrderModal";
+
 interface Props {
   id: string;
   name: string;
   price: number;
   description?: string | null;
   imageKey?: string | null;
-  onEdit: () => void;
-  onDelete: () => void;
+  onOrder: (menuItemId: string, quantity: number, description: string) => void;
 }
 
 export default function MenuItemCard({
+  id,
   name,
   price,
   description,
   imageKey,
-  onEdit,
-  onDelete,
+  onOrder,
 }: Props) {
-  //TODO: Use real s3
+  const [showOrderModal, setShowOrderModal] = useState(false);
+
   const imageUrl = imageKey ? `https://s3-url/${imageKey}` : "/Room.jpg";
 
+  const handleOrder = (quantity: number, note: string) => {
+    onOrder(id, quantity, note);
+    setShowOrderModal(false);
+  };
+
   return (
-    <div className="border p-3 rounded shadow flex flex-col items-center h-full">
+    <div className="border p-3 rounded shadow flex flex-col items-center h-full relative">
       <img
         src={imageUrl}
         alt={name}
@@ -33,22 +43,22 @@ export default function MenuItemCard({
           <p className="text-sm text-gray-600">฿{price}</p>
           {description && <p className="text-sm mt-1">{description}</p>}
         </div>
-
         <div className="flex justify-center gap-2 mt-4">
           <button
             className="bg-yellow-400 px-3 py-1 text-sm rounded text-white"
-            onClick={onEdit}
+            onClick={() => setShowOrderModal(true)}
           >
-            Edit
-          </button>
-          <button
-            className="bg-red-500 px-3 py-1 text-sm rounded text-white"
-            onClick={onDelete}
-          >
-            Delete
+            Order
           </button>
         </div>
       </div>
+
+      {showOrderModal && (
+        <OrderModal
+          onClose={() => setShowOrderModal(false)}
+          onCreate={handleOrder}
+        />
+      )}
     </div>
   );
 }

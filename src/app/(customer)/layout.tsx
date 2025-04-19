@@ -4,6 +4,7 @@ import "../globals.css";
 import Navbar from "@/components/layouts/Navbar";
 import PageContainer from "@/components/layouts/PageContainer";
 import { Toaster } from "react-hot-toast";
+import Footer from "@/components/layouts/Footer";
 
 const itim = Itim({
   variable: "--font-itim",
@@ -41,6 +42,7 @@ export default function RootLayout({
           <Toaster position="top-right" />
           <Navbar />
           <PageContainer children={children} />
+          <Footer />
         </main>
       </body>
     </html>

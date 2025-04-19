@@ -1,6 +1,8 @@
 "use client";
 
+import { Copy } from "lucide-react";
 import { FC } from "react";
+import toast from "react-hot-toast";
 
 interface CustomerListProps {
   customers: any[];
@@ -22,6 +24,13 @@ const CustomerList: FC<CustomerListProps> = ({
       </p>
     );
   }
+
+  const handleCopy = (c: any) => {
+    const baseUrl = window.location.origin;
+    const url = `${baseUrl}/menus?restaurant_id=${c.RestaurantID}&table_id=${c.TableID}&customer_id=${c.ID}`;
+    navigator.clipboard.writeText(url);
+    toast.success("Link copied to clipboard!");
+  };
 
   return (
     <ul className="space-y-2 mb-20 mx-4">
@@ -56,6 +65,13 @@ const CustomerList: FC<CustomerListProps> = ({
                   onClick={() => onDelete(cust)}
                 >
                   🗑 Delete
+                </button>
+                <button
+                  className="bg-yellow-400 hover:bg-yellow-300 text-black px-2 py-1 rounded text-xs flex items-center"
+                  onClick={() => handleCopy(cust)}
+                  title="Copy link"
+                >
+                  <Copy size={16} className="mr-1" />
                 </button>
               </div>
               <div>
