@@ -4,11 +4,14 @@ import CreateCustomerModal from "@/components/customer/CreateCustomerModal";
 import CustomerList from "@/components/customer/CustomerList";
 import DeleteCustomerModal from "@/components/customer/DeleteCustomerModal";
 import EditCustomerModal from "@/components/customer/EditCustomerModal";
+import MakePaymentModal from "@/components/customer/MakePaymentModal";
+import PaymentSuccessModal from "@/components/customer/PaymentSuccessModal";
 import CreateRestaurantModal from "@/components/restaurant/createRestaurantModal";
 import DropDownRestaurant from "@/components/restaurant/dropDownRestaurant";
 import { createCustomer } from "@/services/customer/createCustomer";
 import { deleteCustomer } from "@/services/customer/deleteCustomer";
 import { findAllCustomersByRestaurantId } from "@/services/customer/findAllCustomerByRestaurantId";
+import { MakePayment } from "@/services/customer/MakePayment";
 import { updateCustomerTable } from "@/services/customer/updateCustomer";
 import createRestaurant from "@/services/restaurant/createRestaurant";
 import { findAllRestaurant } from "@/services/restaurant/findAllRestaurant";
@@ -30,6 +33,9 @@ export default function HomePage() {
   const [showCreateCustomerModal, setShowCreateCustomerModal] = useState(false);
   const [editCustomer, setEditCustomer] = useState<any>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [payId, setPayId] = useState<string | null>(null);
+  const [showPaymentSuccessModal, setShowPaymentSuccessModal] = useState(false);
+  const [lastPaidAmount, setLastPaidAmount] = useState<number | null>(null);
 
   const fetchCustomers = async () => {
     if (!selectedRestaurantId) return;
@@ -153,6 +159,23 @@ export default function HomePage() {
     }
   };
 
+  const handleMakePayment = async () => {
+    if (!payId) return;
+    try {
+      const data = await MakePayment(payId);
+      const price = data.result?.TotalPrice;
+      toast.success("Payment made!");
+
+      setPayId(null);
+      setLastPaidAmount(price || 0);
+      setShowPaymentSuccessModal(true);
+
+      fetchCustomers();
+    } catch {
+      toast.error("Payment failed.");
+    }
+  };
+
   return (
     <div className="mt-6">
       <h1 className="text-2xl font-bold text-center">Welcome to Food Order</h1>
@@ -204,12 +227,11 @@ export default function HomePage() {
               <option value="paid">Paid</option>
             </select>
           </div>
-          {/* TODO: Pay */}
           <CustomerList
             customers={filteredCustomers}
             onEdit={(c) => setEditCustomer(c)}
             onDelete={(c) => setDeleteId(c.ID)}
-            onPay={(c) => console.log("Pay", c)}
+            onPay={(c) => setPayId(c.ID)}
           />
         </div>
       </div>
@@ -236,6 +258,21 @@ export default function HomePage() {
         <DeleteCustomerModal
           onClose={() => setDeleteId(null)}
           onDelete={handleDelete}
+        />
+      )}
+      {payId && (
+        <MakePaymentModal
+          onClose={() => setPayId(null)}
+          onAction={handleMakePayment}
+        />
+      )}
+      {showPaymentSuccessModal && lastPaidAmount !== null && (
+        <PaymentSuccessModal
+          totalPrice={lastPaidAmount}
+          onClose={() => {
+            setShowPaymentSuccessModal(false);
+            setLastPaidAmount(null);
+          }}
         />
       )}
     </div>
