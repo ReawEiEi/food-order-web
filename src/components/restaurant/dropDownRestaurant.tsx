@@ -1,5 +1,5 @@
 interface DropDownProps {
-  title: string
+  title: string;
   className?: string;
   options: Restaurant[];
   value: string;
@@ -9,7 +9,7 @@ interface DropDownProps {
 export default function DropDownRestaurant({
   title,
   className,
-  options,
+  options = [], // ✅ default to empty array
   value,
   onChange,
 }: DropDownProps) {
@@ -18,15 +18,18 @@ export default function DropDownRestaurant({
       className={`p-2 border rounded ${className}`}
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      disabled={!options || options.length === 0}
     >
       <option value="" disabled>
-        {title}
+        {!options || options.length === 0 ? "No restaurants available" : title}
       </option>
-      {options.map((option) => (
-        <option key={option.ID} value={option.ID}>
-          {option.RestaurantName} ({option.Branch})
-        </option>
-      ))}
+
+      {options &&
+        options.map((option) => (
+          <option key={option.ID} value={option.ID}>
+            {option.RestaurantName} ({option.Branch})
+          </option>
+        ))}
     </select>
   );
 }

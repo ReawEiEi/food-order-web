@@ -22,7 +22,7 @@ export default function MenuItemsRestaurant() {
 
   const fetchMenus = async () => {
     if (!restaurantId) return;
-    const menus = await findAllMenusByRestaurantID(restaurantId);
+    const menus = (await findAllMenusByRestaurantID(restaurantId)) ?? [];
     const data = await Promise.all(
       menus.map(async (menu: { ID: string }) => {
         const items = await findAllMenuItemsByMenuID(menu.ID);
@@ -72,7 +72,11 @@ export default function MenuItemsRestaurant() {
       <h1 className="text-2xl font-bold text-center mb-6">
         Menu Items of Restaurant
       </h1>
-
+      {menusWithItems.length === 0 ? (
+        <p className="text-center text-gray-500">No menu items found.</p>
+      ) : (
+        <></>
+      )}
       {menusWithItems.map(({ menu, items }) => (
         <div key={menu.ID}>
           <hr className="my-4 border-gray-300" />

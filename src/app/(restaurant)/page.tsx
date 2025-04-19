@@ -1,7 +1,11 @@
 "use client";
 
+import CreateCustomerModal from "@/components/customer/CreateCustomerModal";
+import CustomerList from "@/components/customer/CustomerList";
 import CreateRestaurantModal from "@/components/restaurant/createRestaurantModal";
 import DropDownRestaurant from "@/components/restaurant/dropDownRestaurant";
+import { createCustomer } from "@/services/customer/createCustomer";
+import { findAllCustomersByRestaurantId } from "@/services/customer/findAllCustomerByRestaurantId";
 import createRestaurant from "@/services/restaurant/createRestaurant";
 import { findAllRestaurant } from "@/services/restaurant/findAllRestaurant";
 import { useCustomerStore } from "@/stores/customerStore";
@@ -15,8 +19,11 @@ export default function HomePage() {
   const [hydrated, setHydrated] = useState(false);
   const [restaurants, setRestaurants] = useState<any[]>([]);
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>("");
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [statusFilter, setStatusFilter] = useState<string>("");
 
   const [showRestaurantModal, setShowRestaurantModal] = useState(false);
+  const [showCreateCustomerModal, setShowCreateCustomerModal] = useState(false);
 
   useEffect(() => {
     setHydrated(true);
@@ -41,6 +48,24 @@ export default function HomePage() {
     fetchAllRestaurants();
   }, []);
 
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      if (!selectedRestaurantId) return;
+      try {
+        const data = await findAllCustomersByRestaurantId(selectedRestaurantId);
+        setCustomers(data.result);
+      } catch (error) {
+        console.error("Failed to fetch customers:", error);
+      }
+    };
+
+    fetchCustomers();
+  }, [selectedRestaurantId]);
+
+  const filteredCustomers = (customers || []).filter((c) =>
+    statusFilter ? c.Status === statusFilter : true
+  );
+
   const handleRestaurantChange = (id: string) => {
     setSelectedRestaurantId(id);
     setIds(id, "", "");
@@ -55,7 +80,7 @@ export default function HomePage() {
       const newRestaurant = res.result;
 
       if (newRestaurant?.ID && newRestaurant?.RestaurantName) {
-        setRestaurants((prev) => [...prev, newRestaurant]);
+        setRestaurants((prev) => [...(prev ?? []), newRestaurant]);
         handleRestaurantChange(newRestaurant.ID);
       } else {
         const refreshed = await findAllRestaurant();
@@ -67,6 +92,32 @@ export default function HomePage() {
       setShowRestaurantModal(false);
     } catch (err) {
       toast.error("Failed to create restaurant. Please try again.");
+    }
+  };
+
+  const handleCustomerCreation = async (tableId: string) => {
+    if (!selectedRestaurantId || !tableId) {
+      toast.error("Please select a restaurant and table.");
+      return;
+    }
+
+    try {
+      const res = await createCustomer(
+        selectedRestaurantId,
+        tableId,
+        "occupied"
+      );
+      console.log("Customer creation response:", res);
+
+      if (res) {
+        toast.success("Customer created successfully!");
+        setShowCreateCustomerModal(false);
+        setCustomers((prev) => [...(prev ?? []), res.result]);
+      } else {
+        toast.error("Failed to create customer.");
+      }
+    } catch (error) {
+      toast.error("Failed to create customer. Please try again.");
     }
   };
 
@@ -102,16 +153,47 @@ export default function HomePage() {
           className="bg-yellow-500 text-white px-4 py-2 rounded-md"
           onClick={() =>
             //TODO: Create Customer
-            console.log("CreateCustomer")
+            setShowCreateCustomerModal(true)
           }
         >
           Create Customer
         </button>
+
+        <div className="w-full mt-4">
+          <h3 className="text-lg font-semibold mb-2 text-center">Customers</h3>
+          <div className="mt-4 w-4/5 md:w-1/2 mx-auto mb-4">
+            <label className="block text-sm font-medium mb-1 text-center">
+              Filter by Status
+            </label>
+            <select
+              className="w-full border p-2 rounded"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="">All</option>
+              <option value="occupied">Occupied</option>
+              <option value="paid">Paid</option>
+            </select>
+          </div>
+
+          <CustomerList
+            customers={filteredCustomers}
+            onEdit={(c) => console.log("Edit", c)}
+            onDelete={(c) => console.log("Delete", c)}
+            onPay={(c) => console.log("Pay", c)}
+          />
+        </div>
       </div>
       {showRestaurantModal && (
         <CreateRestaurantModal
           onClose={() => setShowRestaurantModal(false)}
           onCreate={handleCreateRestaurant}
+        />
+      )}
+      {showCreateCustomerModal && (
+        <CreateCustomerModal
+          onClose={() => setShowCreateCustomerModal(false)}
+          onCreate={handleCustomerCreation}
         />
       )}
     </div>

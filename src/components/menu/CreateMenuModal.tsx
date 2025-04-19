@@ -1,6 +1,5 @@
 "use client";
 
-import { Menu } from "lucide-react";
 import { useState } from "react";
 import Modal from "../shared/Modal";
 
@@ -27,10 +26,6 @@ export default function CreateRestaurantModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
       <div className="bg-white rounded-md p-6 w-96 shadow-lg">
-        <h2 className="text-xl font-bold mb-4 text-center">
-          Create Restaurant
-        </h2>
-
         <Modal title="Create Menu" onClose={onClose} onSubmit={handleSubmit}>
           <h1>Menu Name:</h1>
           <input

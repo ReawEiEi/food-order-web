@@ -75,7 +75,7 @@ export default function TableRestaurant() {
       const newTable = res.result;
 
       setTables((prev) => ({
-        result: [...prev.result, newTable],
+        result: [...(prev.result ?? []), newTable],
       }));
 
       toast.success("Table created successfully!");
@@ -104,26 +104,32 @@ export default function TableRestaurant() {
             onChange={setSearchStatus}
           />
         </div>
-        <div className="text-md font-semibold underline underline-offset-4 mt-5">
-          Number of Table: {tables.result.length}
-        </div>
+        {!tables.result && (
+          <p className="text-center text-gray-500">No tables found.</p>
+        )}
+        {tables.result && (
+          <div className="text-md font-semibold underline underline-offset-4 mt-5">
+            Number of Table: {tables.result.length}
+          </div>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-1 px-6 w-full mb-15">
-          {tables.result
-            .filter((t) =>
-              searchStatus === "" ? true : t.Status === searchStatus
-            )
-            .sort((a, b) => a.TableNumber - b.TableNumber)
-            .map((table: any) => (
-              <TableCard
-                key={table.ID}
-                table={table}
-                onEdit={(id) => {
-                  const table = tables.result.find((t) => t.ID === id);
-                  if (table) setEditTable({ id, status: table.Status });
-                }}
-                onDelete={(id) => setDeleteTableId(id)}
-              />
-            ))}
+          {tables.result &&
+            tables.result
+              .filter((t) =>
+                searchStatus === "" ? true : t.Status === searchStatus
+              )
+              .sort((a, b) => a.TableNumber - b.TableNumber)
+              .map((table: any) => (
+                <TableCard
+                  key={table.ID}
+                  table={table}
+                  onEdit={(id) => {
+                    const table = tables.result.find((t) => t.ID === id);
+                    if (table) setEditTable({ id, status: table.Status });
+                  }}
+                  onDelete={(id) => setDeleteTableId(id)}
+                />
+              ))}
         </div>
       </div>
 

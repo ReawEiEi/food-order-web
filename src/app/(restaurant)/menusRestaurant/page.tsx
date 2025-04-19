@@ -30,11 +30,9 @@ export default function MenusRestaurant() {
   const handleCreateMenu = async (menuName: string) => {
     try {
       const res = await createMenu(restaurantId || "", menuName);
-      console.log("Create menu response:", res);
-      console.log("Menus:", menus);
       const newMenu = res.result;
 
-      setMenus([...menus, newMenu]);
+      setMenus([...(menus ?? []), newMenu]);
 
       toast.success("Table created successfully!");
     } catch (err) {
@@ -60,7 +58,7 @@ export default function MenusRestaurant() {
         />
       )}
       <div className="w-10/12 mt-6 mb-15">
-        {menus.length === 0 ? (
+        {!menus || menus.length === 0 ? (
           <p className="text-center text-gray-500">No menus found.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
