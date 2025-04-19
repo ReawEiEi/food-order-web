@@ -24,7 +24,7 @@ const CustomerList: FC<CustomerListProps> = ({
   }
 
   return (
-    <ul className="space-y-2 mb-20">
+    <ul className="space-y-2 mb-20 mx-4">
       {customers
         .sort((a, b) => a.TableNumber - b.TableNumber)
         .map((cust) => (

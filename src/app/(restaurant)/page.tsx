@@ -2,10 +2,12 @@
 
 import CreateCustomerModal from "@/components/customer/CreateCustomerModal";
 import CustomerList from "@/components/customer/CustomerList";
+import DeleteCustomerModal from "@/components/customer/DeleteCustomerModal";
 import EditCustomerModal from "@/components/customer/EditCustomerModal";
 import CreateRestaurantModal from "@/components/restaurant/createRestaurantModal";
 import DropDownRestaurant from "@/components/restaurant/dropDownRestaurant";
 import { createCustomer } from "@/services/customer/createCustomer";
+import { deleteCustomer } from "@/services/customer/deleteCustomer";
 import { findAllCustomersByRestaurantId } from "@/services/customer/findAllCustomerByRestaurantId";
 import { updateCustomerTable } from "@/services/customer/updateCustomer";
 import createRestaurant from "@/services/restaurant/createRestaurant";
@@ -27,6 +29,17 @@ export default function HomePage() {
   const [showRestaurantModal, setShowRestaurantModal] = useState(false);
   const [showCreateCustomerModal, setShowCreateCustomerModal] = useState(false);
   const [editCustomer, setEditCustomer] = useState<any>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const fetchCustomers = async () => {
+    if (!selectedRestaurantId) return;
+    try {
+      const data = await findAllCustomersByRestaurantId(selectedRestaurantId);
+      setCustomers(data.result);
+    } catch (error) {
+      console.error("Failed to fetch customers:", error);
+    }
+  };
 
   useEffect(() => {
     setHydrated(true);
@@ -52,16 +65,6 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    const fetchCustomers = async () => {
-      if (!selectedRestaurantId) return;
-      try {
-        const data = await findAllCustomersByRestaurantId(selectedRestaurantId);
-        setCustomers(data.result);
-      } catch (error) {
-        console.error("Failed to fetch customers:", error);
-      }
-    };
-
     fetchCustomers();
   }, [selectedRestaurantId]);
 
@@ -139,6 +142,17 @@ export default function HomePage() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    try {
+      await deleteCustomer(deleteId);
+      toast.success("Customer deleted!");
+      fetchCustomers();
+    } catch {
+      toast.error("Delete failed.");
+    }
+  };
+
   return (
     <div className="mt-6">
       <h1 className="text-2xl font-bold text-center">Welcome to Food Order</h1>
@@ -190,11 +204,11 @@ export default function HomePage() {
               <option value="paid">Paid</option>
             </select>
           </div>
-          {/* TODO: Delete, Pay */}
+          {/* TODO: Pay */}
           <CustomerList
             customers={filteredCustomers}
             onEdit={(c) => setEditCustomer(c)}
-            onDelete={(c) => console.log("Delete", c)}
+            onDelete={(c) => setDeleteId(c.ID)}
             onPay={(c) => console.log("Pay", c)}
           />
         </div>
@@ -216,6 +230,12 @@ export default function HomePage() {
           customer={editCustomer}
           onClose={() => setEditCustomer(null)}
           onUpdate={handleUpdateCustomer}
+        />
+      )}
+      {deleteId && (
+        <DeleteCustomerModal
+          onClose={() => setDeleteId(null)}
+          onDelete={handleDelete}
         />
       )}
     </div>
