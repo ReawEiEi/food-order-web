@@ -2,10 +2,12 @@
 
 import CreateCustomerModal from "@/components/customer/CreateCustomerModal";
 import CustomerList from "@/components/customer/CustomerList";
+import EditCustomerModal from "@/components/customer/EditCustomerModal";
 import CreateRestaurantModal from "@/components/restaurant/createRestaurantModal";
 import DropDownRestaurant from "@/components/restaurant/dropDownRestaurant";
 import { createCustomer } from "@/services/customer/createCustomer";
 import { findAllCustomersByRestaurantId } from "@/services/customer/findAllCustomerByRestaurantId";
+import { updateCustomerTable } from "@/services/customer/updateCustomer";
 import createRestaurant from "@/services/restaurant/createRestaurant";
 import { findAllRestaurant } from "@/services/restaurant/findAllRestaurant";
 import { useCustomerStore } from "@/stores/customerStore";
@@ -24,6 +26,7 @@ export default function HomePage() {
 
   const [showRestaurantModal, setShowRestaurantModal] = useState(false);
   const [showCreateCustomerModal, setShowCreateCustomerModal] = useState(false);
+  const [editCustomer, setEditCustomer] = useState<any>(null);
 
   useEffect(() => {
     setHydrated(true);
@@ -107,7 +110,6 @@ export default function HomePage() {
         tableId,
         "occupied"
       );
-      console.log("Customer creation response:", res);
 
       if (res) {
         toast.success("Customer created successfully!");
@@ -118,6 +120,22 @@ export default function HomePage() {
       }
     } catch (error) {
       toast.error("Failed to create customer. Please try again.");
+    }
+  };
+
+  const handleUpdateCustomer = async (payload: {
+    customer_id: string;
+    new_table_id: string;
+  }) => {
+    try {
+      const data = await updateCustomerTable(payload);
+      toast.success("Customer updated!");
+      const refreshed = await findAllCustomersByRestaurantId(
+        selectedRestaurantId
+      );
+      setCustomers(refreshed.result ?? []);
+    } catch {
+      toast.error("Failed to update customer.");
     }
   };
 
@@ -151,10 +169,7 @@ export default function HomePage() {
       <div className="flex flex-col items-center mt-12 gap-y-5">
         <button
           className="bg-yellow-500 text-white px-4 py-2 rounded-md"
-          onClick={() =>
-            //TODO: Create Customer
-            setShowCreateCustomerModal(true)
-          }
+          onClick={() => setShowCreateCustomerModal(true)}
         >
           Create Customer
         </button>
@@ -175,10 +190,10 @@ export default function HomePage() {
               <option value="paid">Paid</option>
             </select>
           </div>
-
+          {/* TODO: Delete, Pay */}
           <CustomerList
             customers={filteredCustomers}
-            onEdit={(c) => console.log("Edit", c)}
+            onEdit={(c) => setEditCustomer(c)}
             onDelete={(c) => console.log("Delete", c)}
             onPay={(c) => console.log("Pay", c)}
           />
@@ -194,6 +209,13 @@ export default function HomePage() {
         <CreateCustomerModal
           onClose={() => setShowCreateCustomerModal(false)}
           onCreate={handleCustomerCreation}
+        />
+      )}
+      {editCustomer && (
+        <EditCustomerModal
+          customer={editCustomer}
+          onClose={() => setEditCustomer(null)}
+          onUpdate={handleUpdateCustomer}
         />
       )}
     </div>
