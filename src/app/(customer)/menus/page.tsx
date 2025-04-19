@@ -10,15 +10,26 @@ import toast from "react-hot-toast";
 
 export default function MenuPage() {
   const searchParams = useSearchParams();
-  const restaurantId = searchParams.get("restaurant_id");
-  const tableId = searchParams.get("table_id");
-  const customerId = searchParams.get("customer_id");
+  const {
+    restaurantId: storeResId,
+    tableId: storeTableId,
+    customerId: storeCId,
+    setIds,
+  } = useCustomerStore();
+
+  const restaurantId = searchParams.get("restaurant_id") || storeResId;
+  const tableId = searchParams.get("table_id") || storeTableId;
+  const customerId = searchParams.get("customer_id") || storeCId;
+
   useEffect(() => {
-    const setIds = useCustomerStore.getState().setIds;
-    if (restaurantId || tableId || customerId) {
-      setIds(restaurantId || "", tableId || "", customerId || "");
+    const urlResId = searchParams.get("restaurant_id");
+    const urlTableId = searchParams.get("table_id");
+    const urlCustId = searchParams.get("customer_id");
+
+    if (urlResId || urlTableId || urlCustId) {
+      setIds(urlResId || "", urlTableId || "", urlCustId || "");
     }
-  }, [restaurantId, tableId, customerId]);
+  }, [searchParams]);
 
   const [menusWithItems, setMenusWithItems] = useState<MenuWithItems[]>([]);
 
